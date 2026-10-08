@@ -43,13 +43,7 @@ jobs:
         run: npm ci
 
       - name: Run tests
-        run: node --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=lcov.info test.cjs
-
-      - name: Send to Codacy
-        uses: codacy/codacy-coverage-reporter-action@v1
-        with:
-          coverage-reports: lcov.info
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        run: node --test --experimental-test-coverage test.cjs
 
   test:
     strategy:
