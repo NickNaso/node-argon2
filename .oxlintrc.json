@@ -18,5 +18,17 @@
   "env": {
     "node": true
   },
-  "globals": {}
+  "globals": {},
+  "overrides": [
+    {
+      "files": ["marmotta.config.js", "scripts/*.cjs"],
+      "rules": {
+        "eslint/no-ternary": "off",
+        "eslint/sort-keys": "off",
+        "eslint/prefer-named-capture-group": "off",
+        "eslint/require-unicode-regexp": "off",
+        "eslint/prefer-template": "off"
+      }
+    }
+  ]
 }

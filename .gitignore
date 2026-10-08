@@ -20,3 +20,7 @@ node_modules/
 # Generated Typescript declarations
 *.d.cts
 *.d.cts.map
+
+# marmotta
+.marmotta/
+prebuilds/

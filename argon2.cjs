@@ -1,9 +1,17 @@
 const { randomBytes, timingSafeEqual } = require("node:crypto");
+const { join } = require("node:path");
 const { promisify } = require("node:util");
 const { deserialize, serialize } = require("@phc/format");
-const gypBuild = require("node-gyp-build");
+const { currentTag, prebuildPath, existsSync } = require("./scripts/targets.cjs");
 
-const { hash: bindingsHash } = gypBuild(__dirname);
+const addonPath = [prebuildPath(__dirname), join(__dirname, "build", "argon2.node")].find((path) =>
+  existsSync(path),
+);
+if (!addonPath) {
+  throw new Error(`No native build of argon2 found for ${currentTag()}`);
+}
+
+const { hash: bindingsHash } = require(addonPath);
 
 /** @type {(size: number) => Promise<Buffer>} */
 const generateSalt = promisify(randomBytes);

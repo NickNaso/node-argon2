@@ -80,7 +80,7 @@ const hash = await argon2.hash(..);
 ## Prebuilt binaries
 
 **node-argon2** provides prebuilt binaries from `v0.26.0` onwards. They are
-built every release using GitHub Actions.
+cross-compiled with Zig (through marmotta) every release using GitHub Actions.
 
 The current prebuilt binaries are built and tested with the following systems:
 
@@ -103,36 +103,17 @@ build from source to ensure consistency of the compiled module.
 
 _You can skip this section if the [prebuilt binaries](#prebuilt-binaries) work for you._
 
-You **MUST** have a **node-gyp** global install before proceeding with the install,
-along with GCC >= 5 / Clang >= 3.3. On Windows, you must compile under Visual
-Studio 2015 or newer.
+When no prebuilt binary matches your system, the install script compiles
+**node-argon2** from source using [marmotta](https://github.com/napi-bindings/marmotta),
+which drives the [Zig](https://ziglang.org) toolchain instead of node-gyp. You
+do **not** need Python, make, GCC or Visual Studio.
+
+Marmotta uses the `zig` found on your `PATH`, or otherwise downloads the stable
+release into `~/.marmotta` (needs `tar` and internet access; automatic downloads
+are available on x64 and ARM64 for Linux, macOS and Windows). On other systems,
+install Zig yourself and make it available on `PATH`.
 
 **node-argon2** works only and is tested against Node >=22.0.0.
-
-### OSX
-
-To install GCC >= 5 on OSX, use [homebrew](http://brew.sh/):
-
-```console
-$ brew install gcc
-```
-
-Once you've got GCC installed and ready to run, you then need to install
-node-gyp, you must do this globally:
-
-```console
-$ npm install -g node-gyp
-```
-
-Finally, once node-gyp is installed and ready to go, you can install this
-library, specifying the GCC or Clang binary to use:
-
-```console
-$ CXX=g++-12 npm install argon2
-```
-
-**NOTE**: If your GCC or Clang binary is named something different than `g++-12`,
-you'll need to specify that in the command.
 
 ## FAQ
 
@@ -140,15 +121,11 @@ you'll need to specify that in the command.
   <summary>How do I manually rebuild the binaries?</summary>
 
 ```bash
-$ npx @mapbox/node-pre-gyp rebuild -C ./node_modules/argon2
+$ npx marmotta build -C ./node_modules/argon2
 ```
 
-Run `@mapbox/node-pre-gyp` instead of `node-gyp` because node-argon2's
-`binding.gyp` file relies on variables from `@mapbox/node-pre-gyp`.
-
-You can omit `npx @mapbox` and use just `node-pre-gyp` if you have a global
-installation of `@mapbox/node-pre-gyp`, otherwise prefixing `npx` will use
-the local one in `./node_modules/.bin`
+The addon is written to `node_modules/argon2/build/argon2.node`, which is
+used when no prebuilt binary matches your system.
 
 </details>
 
@@ -157,19 +134,13 @@ the local one in `./node_modules/.bin`
     How do I skip installing prebuilt binaries and manually compile from source?
   </summary>
 
-You can do either of the two methods below:
-
-1. Force build from source on install.
-
-```bash
-$ npm install argon2 --build-from-source
-```
-
-2. Ignore `node-argon2` install script and build manually.
+Ignore the `node-argon2` install script and build manually. Binaries in `build/`
+are only used when there is no prebuild for your platform, so remove it first:
 
 ```bash
 $ npm install argon2 --ignore-scripts
-$ npx node-gyp rebuild -C ./node_modules/argon2
+$ rm -r ./node_modules/argon2/prebuilds
+$ npx marmotta build -C ./node_modules/argon2
 ```
 
 </details>
